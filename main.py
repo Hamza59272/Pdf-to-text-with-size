@@ -138,3 +138,7 @@ async def detect_letters(
         raise HTTPException(500, detail="Internal server error")
     finally:
         await file.close()
+
+@app.get("/")
+async def startup():
+        return {"message": "API is Running"}
