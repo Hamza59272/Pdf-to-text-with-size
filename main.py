@@ -142,3 +142,11 @@ async def detect_letters(
 @app.get("/")
 async def startup():
         return {"message": "API is Running"}
+
+
+import os
+import uvicorn
+
+if __name__ == "__main__":
+    port = int(os.getenv("PORT", 8000))  # Use Railway’s assigned port
+    uvicorn.run(app, host="0.0.0.0", port=port)
