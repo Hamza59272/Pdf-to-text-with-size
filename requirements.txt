@@ -1,0 +1,4 @@
+opencv-python
+numpy 
+pdf2image
+poppler-utils 
