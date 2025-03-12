@@ -26,7 +26,7 @@ pillow>=8.3.0
 ### Running Locally (without Docker)
 1. Clone the repository:
     ```sh
-    git clone [pdf to text size](https://github.com/Hamza59272/Pdf-to-text-with-size)
+    git clone https://github.com/Hamza59272/Pdf-to-text-with-size.git
     cd Pdf-to-text-with-size
     ```
 2. Create a virtual environment and activate it:
