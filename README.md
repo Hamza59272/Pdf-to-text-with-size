@@ -42,7 +42,7 @@ pillow>=8.3.0
     ```sh
     uvicorn main:app --host 0.0.0.0 --port 8000 --reload
     ```
-5. API will be available at: `http://127.0.0.1:8000/docs`
+5. API will be available at: `http://127.0.0.1:8000/`
 
 ### Running with Docker
 1. Build the Docker image:
