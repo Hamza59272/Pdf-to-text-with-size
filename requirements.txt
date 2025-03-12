@@ -1,4 +1,4 @@
-fastapi>=0.68.0
+fastapi
 uvicorn>=0.15.0
 pymupdf>=1.18.0
 opencv-python-headless>=4.5.0
