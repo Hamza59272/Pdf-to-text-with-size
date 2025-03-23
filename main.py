@@ -224,7 +224,7 @@ async def detect_letters(
             prices = Aluminium_Doosletter_Price_calculator(letters, data)
             result_data = prices
 
-        elif profile == "Profiel 2":
+        elif profile == "Profiel 2" or profile == "Profiel 3":
             prices = Profiel2_Price_calculator(letters, data)
             result_data = prices
 
@@ -279,7 +279,8 @@ async def getPrice(
         if profile == "Aluminium Doosletter":
             prices = Aluminium_Doosletter_Price_calculator(letters, data)
             result_data = prices["totalPrice"]
-        elif profile == "Profiel 2":
+
+        elif profile == "Profiel 2" or profile == "Profiel 3":
             prices = Profiel2_Price_calculator(letters, data)
             result_data = prices["totalPrice"]
         
