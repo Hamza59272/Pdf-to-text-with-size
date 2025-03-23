@@ -49,7 +49,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # Allow frontend
+    allow_origins=["https://banner-nu-seven.vercel.app/" ,"https://banner-nu-seven.vercel.app", "http://localhost:5173"],  # Allow frontend
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
