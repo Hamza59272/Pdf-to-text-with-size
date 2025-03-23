@@ -256,12 +256,49 @@ async def detect_letters(
     finally:
         await file.close()
 
+@app.post("/get-price/")
+async def getPrice(
+    file: UploadFile = File(...),
+    profile: str = Form(...),
+    data: str = Form(...),
+    target_length: int = Form(200),
+    target_height: int = Form(100)
+):
+    try:
+        file_bytes = await file.read()
+
+        data_type, extracted_data = extract_image_or_text(file_bytes, file.content_type)
+        
+        if data_type == "image":
+            letters = process_image(extracted_data, target_length, target_height)
+        else:
+            letters = scale_text_data(extracted_data, target_length, target_height)
+            
+        if profile == "Aluminium Doosletter":
+            prices = Aluminium_Doosletter_Price_calculator(letters, data)
+            result_data = prices["totalPrice"]
+        
+        else:
+            result_data = 0
+
+        return {
+            "success" : True,
+            "data": result_data
+        }
+    except ValueError as e:
+        raise HTTPException(400, detail=str(e))
+    except Exception as e:
+        logging.error(f"Unexpected error: {str(e)}")
+        raise HTTPException(500, detail="Internal server error")
+    finally:
+        await file.close()
+
 
 @app.get("/orders/")
 async def view_all_orders():
     data = await fetch_orders(db) 
     response_data = convert_objectid(data)
-    print("response data " , response_data)
+    # print("response data " , response_data)
     return {
         "success": True,
         "data": response_data
