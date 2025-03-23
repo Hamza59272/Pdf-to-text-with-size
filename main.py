@@ -8,7 +8,7 @@ from io import BytesIO
 import logging
 from pdfminer.high_level import extract_pages
 from pdfminer.layout import LTTextBox, LTTextLine, LTChar
-from price_calculater import Aluminium_Doosletter_Price_calculator , Profiel2_Price_calculator , Profiel3_LUX_Price_calculator ,Profiel4_Price_calculator , Profiel5_Price_calculator
+from price_calculater import Aluminium_Doosletter_Price_calculator , Profiel2_Price_calculator , Profiel3_LUX_Price_calculator ,Profiel4_Price_calculator , Profiel5_Price_calculator , Profiel5_LUX_Price_calculator
 from fastapi.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 from pymongo import MongoClient
@@ -240,6 +240,10 @@ async def detect_letters(
             prices = Profiel5_Price_calculator(letters, data)
             result_data = prices
 
+        elif profile == "Profiel5 LUX":
+            prices = Profiel5_LUX_Price_calculator(letters, data)
+            result_data = prices
+
         
         else:
             result_data = []
@@ -306,6 +310,10 @@ async def getPrice(
 
         elif profile == "Profiel5":
             prices = Profiel5_Price_calculator(letters, data)
+            result_data = prices
+
+        elif profile == "Profiel5 LUX":
+            prices = Profiel5_LUX_Price_calculator(letters, data)
             result_data = prices
 
         else:
