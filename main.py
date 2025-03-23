@@ -45,17 +45,16 @@ orders_collection = db["orders"]
 
 app = FastAPI()
 
+app = FastAPI()
+
 app.add_middleware(
-        CORSMiddleware,
-        allow_origins=["http://localhost:5173"],  # Allow all origins (change to ["http://localhost:3000"] for security)
-        allow_credentials=True,
-        allow_methods=["*"],  # Allow all HTTP methods
-        allow_headers=["*"],  # Allow all headers
-    )
-app = FastAPI(
-    root_path="/",
-    trust_env=True  # If behind a proxy like Nginx
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],  # Allow frontend
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
+
 
 def extract_image_or_text(file_bytes: bytes, content_type: str):
     """
