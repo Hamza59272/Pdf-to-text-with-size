@@ -221,5 +221,55 @@ def Profiel4_Price_calculator(letters, data):
     except Exception as e:
         return {"error": str(e)}
 
+def Profiel5_Price_calculator(letters, data):
+    """
+    Calculates the price of each letter based on given parameters.
+    """
+    try:
+        data = json.loads(data)  # Parse JSON-formatted string
+        # plexi_size = int(data.get("plexi_size", 3))
+        width_of_letter = int(data.get("width_of_letter", 6))
+        colors = data.get("colors", [])
+
+        # plexi_size_adjustment = {3: 0, 5: 10, 10: 15}
+        width_adjustment_per_cm = 2.5  
+        extra_color_cost = 20 if len(colors) > 1 else 0
+
+        prices = []
+        for letter in letters:
+            scaled_height = letter["scaled_height"]
+            scaled_length = letter["scaled_length"]  # Fixed typo from scaled_length
+            base_price = None
+
+            for height_range, price in base_prices.items():
+                min_h, max_h = map(lambda x: int(x.replace("cm", "")), height_range.split('-'))
+                if min_h <= scaled_height <= max_h:
+                    base_price = price
+                    break
+
+            if base_price is None:
+                base_price = 160  # Default highest price if beyond 90cm
+
+            width_adjustment = (abs(width_of_letter - 6) * width_adjustment_per_cm)
+
+            final_price = base_price * (1 + (width_adjustment / 100))
+            # final_price += (base_price * (plexi_size_adjustment.get(plexi_size, 0) / 100))
+            final_price += extra_color_cost
+
+            prices.append({
+                "letter": letter["letter"],
+                "scaled_length": scaled_length,
+                "scaled_height": scaled_height,
+                "price": round(final_price, 2)
+            })
+        
+        data = {
+            "totalPrice" : sum(item["price"] for item in prices),
+            "prices" : prices
+        }
+        return data
+    except Exception as e:
+        return {"error": str(e)}
+
 
 
