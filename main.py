@@ -52,6 +52,10 @@ app.add_middleware(
         allow_methods=["*"],  # Allow all HTTP methods
         allow_headers=["*"],  # Allow all headers
     )
+app = FastAPI(
+    root_path="/",
+    trust_env=True  # If behind a proxy like Nginx
+)
 
 def extract_image_or_text(file_bytes: bytes, content_type: str):
     """
