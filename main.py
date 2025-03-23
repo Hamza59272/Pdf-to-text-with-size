@@ -17,6 +17,7 @@ import logging
 from motor.motor_asyncio import AsyncIOMotorGridFSBucket
 from orders import fetch_orders, get_order_by_id, delete_order
 from fileRouters import download_file , delete_file
+from userRouters import add_user, edit_user, delete_user, payment_completed, get_all_users, get_one_user
 from bson import ObjectId
 import json
 
@@ -171,6 +172,10 @@ def process_image(image: np.ndarray, target_length: int, target_height: int) -> 
         logging.error(f"Image processing error: {str(e)}")
         raise
 
+# ---------------------------------------------------------------------------
+#  All Routes
+# ---------------------------------------------------------------------------
+
 
 @app.post("/detect-letters/")
 async def detect_letters(
@@ -266,6 +271,30 @@ async def downloadfile(file_id: str):
 @app.delete("/delete-file/{file_id}")
 async def deletefile(file_id: str):
     return await delete_file(file_id, fs ,db)
+
+@app.post("/create-user/")
+async def create_user(user_data: dict):
+    return await add_user(db, user_data)
+
+@app.put("/update-user/{user_id}")
+async def update_user(user_id: str, update_data: dict):
+    return await edit_user(db, user_id, update_data)
+
+@app.delete("/delete-user/{user_id}")
+async def remove_user(user_id: str):
+    return await delete_user(db, user_id)
+
+@app.patch("/payment/{user_id}")
+async def mark_payment_complete(user_id: str):
+    return await payment_completed(db, user_id)
+
+@app.get("/get-users/")
+async def fetch_all_users():
+    return await get_all_users(db)
+
+@app.get("/get-user/{user_id}")
+async def fetch_user(user_id: str):
+    return await get_one_user(db, user_id)
 
 
 @app.get("/")
