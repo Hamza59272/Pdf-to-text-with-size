@@ -1,5 +1,7 @@
+from datetime import datetime
 from fastapi import FastAPI, File, UploadFile, Form, HTTPException
 import cv2
+from helpers.converters import convert_objectid
 import numpy as np
 import fitz  # PyMuPDF
 from io import BytesIO
@@ -8,6 +10,37 @@ from pdfminer.high_level import extract_pages
 from pdfminer.layout import LTTextBox, LTTextLine, LTChar
 from price_calculater import Aluminium_Doosletter_Price_calculator
 from fastapi.middleware.cors import CORSMiddleware
+from motor.motor_asyncio import AsyncIOMotorClient
+from pymongo import MongoClient
+from gridfs import GridFS
+import logging
+from motor.motor_asyncio import AsyncIOMotorGridFSBucket
+from orders import fetch_orders, get_order_by_id, delete_order
+from fileRouters import download_file , delete_file
+from bson import ObjectId
+import json
+
+MONGODB_URI = "mongodb+srv://admin:marketplace123@aluminiumprice.1z9vj.mongodb.net/?retryWrites=true&w=majority&appName=AluminiumPrice"
+DB_NAME = "marketplace"  # Replace with your actual database name
+
+try:
+    # Async connection for FastAPI
+    async_client = AsyncIOMotorClient(MONGODB_URI)
+    db = async_client[DB_NAME]
+
+    # Sync connection for GridFS
+    sync_client = MongoClient(MONGODB_URI)
+    sync_db = sync_client[DB_NAME]
+
+    # Async GridFS Bucket
+    fs = AsyncIOMotorGridFSBucket(db)
+
+    logging.info("MongoDB connection successful.")
+except Exception as e:
+    logging.error(f"Error connecting to MongoDB: {str(e)}")
+    raise
+
+orders_collection = db["orders"]
 
 app = FastAPI()
 
@@ -149,21 +182,56 @@ async def detect_letters(
 ):
     try:
         file_bytes = await file.read()
+
+#         file_id = fs.put(
+#     file_bytes,
+#     filename=file.filename,
+#     content_type=file.content_type
+# )
+        file_id = await fs.upload_from_stream(
+            file.filename, BytesIO(file_bytes), metadata={"content_type": file.content_type}
+        )
+
+
         data_type, extracted_data = extract_image_or_text(file_bytes, file.content_type)
 
+        
         if data_type == "image":
             letters = process_image(extracted_data, target_length, target_height)
-            print("Letters are " , letters)
+            # print("Letters are " , letters)
         else:
             letters = scale_text_data(extracted_data, target_length, target_height)
-            print("Letters are " , letters)
+            # print("Letters are " , letters)
 
             
         if profile == "Aluminium Doosletter":
             prices = Aluminium_Doosletter_Price_calculator(letters, data)
-            return { "data" :  prices }
+            result_data = prices
+
+            # return { "data" :  prices }
+            result_data = prices
+        
         else:
-            return { "data": letters }
+            result_data = []
+        
+        order_data = {
+            "file_id": file_id,
+            "target_length": target_length,
+            "target_height": target_height,
+            "profile": profile,
+            "original_data": json.loads(data),
+            "prices": result_data,
+            "timestamp": datetime.utcnow()
+        }
+
+        order_id = await db.orders.insert_one(order_data)
+        print("Created order with ID:", order_id.inserted_id)
+
+        return {
+            "success" : True,
+            "data": result_data,
+            "order_id": str(order_id.inserted_id)
+        }
     except ValueError as e:
         raise HTTPException(400, detail=str(e))
     except Exception as e:
@@ -171,6 +239,34 @@ async def detect_letters(
         raise HTTPException(500, detail="Internal server error")
     finally:
         await file.close()
+
+
+@app.get("/orders/")
+async def view_all_orders():
+    data = await fetch_orders(db) 
+    response_data = convert_objectid(data)
+    print("response data " , response_data)
+    return {
+        "success": True,
+        "data": response_data
+            }
+
+@app.get("/orders/{order_id}")
+async def view_order(order_id: str):
+    return await get_order_by_id(db, order_id)  # Pass db explicitly
+
+@app.delete("/orders/{order_id}")
+async def delete_order_by_id(order_id: str):
+    return await delete_order(db, order_id)  # Pass db explicitly
+
+@app.get("/download/{file_id}")
+async def downloadfile(file_id: str):
+    return await download_file(file_id, fs)
+
+@app.delete("/delete-file/{file_id}")
+async def deletefile(file_id: str):
+    return await delete_file(file_id, fs ,db)
+
 
 @app.get("/")
 async def startup():
