@@ -45,6 +45,14 @@ orders_collection = db["orders"]
 
 app = FastAPI()
 
+app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],  # Allow all origins (change to ["http://localhost:3000"] for security)
+        allow_credentials=True,
+        allow_methods=["*"],  # Allow all HTTP methods
+        allow_headers=["*"],  # Allow all headers
+    )
+
 def extract_image_or_text(file_bytes: bytes, content_type: str):
     """
     Extracts either an image or text from a given file.
@@ -304,13 +312,8 @@ async def startup():
 import os
 import uvicorn
 
+
 if __name__ == "__main__":
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=["*"],  # Allow all origins (change to ["http://localhost:3000"] for security)
-        allow_credentials=True,
-        allow_methods=["*"],  # Allow all HTTP methods
-        allow_headers=["*"],  # Allow all headers
-    )
+    
     port = int(os.getenv("PORT", 8000))
     uvicorn.run(app, host="0.0.0.0", port=port)
