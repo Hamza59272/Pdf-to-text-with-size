@@ -21,12 +21,17 @@ from userRouters import add_user, edit_user, delete_user, payment_completed, get
 from payment import create_mollie_payment, PaymentRequest
 from bson import ObjectId
 import json
+import os
+from dotenv import load_dotenv
 
-MONGODB_URI = "mongodb+srv://admin:marketplace123@aluminiumprice.1z9vj.mongodb.net/?retryWrites=true&w=majority&appName=AluminiumPrice"
+load_dotenv()
+
+MONGODB_URI = os.getenv("DATABASE_KEY")
 DB_NAME = "marketplace"  # Replace with your actual database name
 
 try:
     # Async connection for FastAPI
+    print("DATABASE URI is " , MONGODB_URI )
     async_client = AsyncIOMotorClient(MONGODB_URI)
     db = async_client[DB_NAME]
 
