@@ -21,6 +21,7 @@ class PaymentRequest(BaseModel):
 
 def create_mollie_payment(payment: PaymentRequest):
     try:
+        print("Got MOLLIE_API_KEY " , MOLLIE_API_KEY)
         payment_response = mollie_client.payments.create({
             "amount": {"currency": "EUR", "value": f"{payment.amount:.2f}"},
             "description": payment.description,
