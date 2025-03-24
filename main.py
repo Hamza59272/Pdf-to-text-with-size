@@ -18,6 +18,7 @@ from motor.motor_asyncio import AsyncIOMotorGridFSBucket
 from orders import fetch_orders, get_order_by_id, delete_order
 from fileRouters import download_file , delete_file
 from userRouters import add_user, edit_user, delete_user, payment_completed, get_all_users, get_one_user
+from payment import create_mollie_payment, PaymentRequest
 from bson import ObjectId
 import json
 
@@ -381,6 +382,15 @@ async def fetch_all_users():
 @app.get("/get-user/{user_id}")
 async def fetch_user(user_id: str):
     return await get_one_user(db, user_id)
+
+
+@app.post("/create-payment/")
+def create_payment(payment: PaymentRequest):
+    response = create_mollie_payment(payment)
+    if "error" in response:
+        raise HTTPException(status_code=400, detail=response["error"])
+    return response
+
 
 
 @app.get("/")
