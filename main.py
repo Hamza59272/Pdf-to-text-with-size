@@ -31,7 +31,7 @@ DB_NAME = "marketplace"  # Replace with your actual database name
 
 try:
     # Async connection for FastAPI
-    print("DATABASE URI is " , MONGODB_URI )
+    # print("DATABASE URI is " , MONGODB_URI )
     async_client = AsyncIOMotorClient(MONGODB_URI)
     db = async_client[DB_NAME]
 
