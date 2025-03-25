@@ -17,6 +17,19 @@ base_prices = {
             "86-90cm": 160
         }
 
+profiel3_lux_base_prices = {
+    "20-25cm": 25,
+    "25-30cm": 38,
+    "31-40cm": 50,
+    "41-50cm": 70,
+    "51-60cm": 90,
+    "61-70cm": 110,
+    "71-80cm": 130,
+    "81-90cm": 150,
+    "91-100cm": 170
+}
+
+
 def Aluminium_Doosletter_Price_calculator(letters, data):
     """
     Calculates the price of each letter based on given parameters.
@@ -131,7 +144,7 @@ def Profiel3_LUX_Price_calculator(letters, data):
         width_of_letter = int(data.get("width_of_letter", 6))
         colors = data.get("colors", [])
 
-        plexi_size_adjustment = {10: 0, 20: 30, 30: 45}
+        plexi_size_adjustment = {10: 0, 20: 25, 30: 45}
         width_adjustment_per_cm = 2.5  
         extra_color_cost = 20 if len(colors) > 1 else 0
 
@@ -141,7 +154,7 @@ def Profiel3_LUX_Price_calculator(letters, data):
             scaled_length = letter["scaled_length"]  # Fixed typo from scaled_length
             base_price = None
 
-            for height_range, price in base_prices.items():
+            for height_range, price in profiel3_lux_base_prices.items():
                 min_h, max_h = map(lambda x: int(x.replace("cm", "")), height_range.split('-'))
                 if min_h <= scaled_height <= max_h:
                     base_price = price
